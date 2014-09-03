@@ -9,5 +9,5 @@ exports.test = function() {
   var failure = function (err) {
     console.log(err);
   }
-  exec(success, failure, 'ChromeEcho', 'echo', [message]);
+  exec(success, failure, 'ChromeEcho', 'test', [message]);
 }

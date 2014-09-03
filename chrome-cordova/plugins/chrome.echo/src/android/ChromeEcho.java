@@ -12,15 +12,15 @@ public class ChromeEcho extends CordovaPlugin {
       String action,
       JSONArray args,
       CallbackContext callbackContext) throws JSONException {
-    if ("echo".equals(action)) {
+    if ("test".equals(action)) {
       String message = args.getString(0);
-      this.echo(message, callbackContext);
+      this.test(message, callbackContext);
       return true;
     }
     return false;
   }
 
-  private void echo(String message, CallbackContext callbackContext) {
+  private void test(String message, CallbackContext callbackContext) {
     if (message != null) {
       callbackContext.success(message);
     } else {

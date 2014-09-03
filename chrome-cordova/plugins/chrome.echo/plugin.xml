@@ -27,4 +27,15 @@
     </config-file>
   </platform>
 
+  <platform name="ios">
+    <source-file src="src/ios/ChromeEcho.m" />
+    <header-file src="src/ios/ChromeEcho.h" />
+
+    <config-file target="config.xml" parent="/widget">
+      <feature name="ChromeEcho">
+        <param name="ios-package" value="ChromeEcho" />
+      </feature>
+    </config-file>
+  </platform>
+
 </plugin>
