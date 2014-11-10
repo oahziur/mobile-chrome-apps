@@ -340,11 +340,12 @@ static NSString* stringFromData(NSData* data) {
         return;
     }
    
+    id<CDVCommandDelegate> commandDelegate = self.commandDelegate;
     socket->_connectCallback = [^(BOOL success, NSError* error) {
         if (success) {
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+            [commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
         } else {
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[self buildErrorInfoWithErrorCode:[error code] message:[error localizedDescription]]] callbackId:command.callbackId];
+            [commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:[self buildErrorInfoWithErrorCode:[error code] message:[error localizedDescription]]] callbackId:command.callbackId];
         }
     } copy];
     
@@ -364,9 +365,10 @@ static NSString* stringFromData(NSData* data) {
     if (socket == nil)
         return;
 
+    id<CDVCommandDelegate> commandDelegate = self.commandDelegate;
     socket->_disconnectCallback = [^(){
         if (theCallbackId)
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:theCallbackId];
+            [commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:theCallbackId];
         if (close)
             [_sockets removeObjectForKey:socketId];
     } copy];
@@ -414,8 +416,9 @@ static NSString* stringFromData(NSData* data) {
         return;
     }
  
+    id<CDVCommandDelegate> commandDelegate = self.commandDelegate;
     socket->_secureCallback = [^() {
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+        [commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
     } copy];
   
     NSMutableDictionary* settings = [NSMutableDictionary dictionaryWithCapacity:2];
@@ -450,10 +453,10 @@ static NSString* stringFromData(NSData* data) {
     }
    
     if ([socket->_socket isConnected]) {
-        
+        id<CDVCommandDelegate> commandDelegate = self.commandDelegate;
         [socket->_sendCallbacks addObject:[^() {
             VERBOSE_LOG(@"ACK %@.%@ Write", socketId, command.callbackId);
-            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:[data length]] callbackId:command.callbackId];
+            [commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:[data length]] callbackId:command.callbackId];
         } copy]];
         
         [socket->_socket writeData:data withTimeout:-1 tag:-1];
