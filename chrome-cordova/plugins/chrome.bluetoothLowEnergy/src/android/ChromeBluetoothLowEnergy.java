@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.Semaphore;
 
 import static org.apache.cordova.PluginResult.Status;
 
@@ -397,102 +398,125 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
     callbackContext.sendPluginResult(new PluginResult(Status.OK, descriptorsInfo));
   }
 
-  private void readCharacteristicValue(CordovaArgs args, CallbackContext callbackContext)
+  private void readCharacteristicValue(CordovaArgs args, final CallbackContext callbackContext)
       throws JSONException {
 
-    String characteristicId = args.getString(0);
+    final String characteristicId = args.getString(0);
     String deviceAddress = getDeviceAddressFromInstanceId(characteristicId);
 
-    ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
+    final ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
 
     if (peripheral == null) {
       callbackContext.error("Invalid Argument");
       return;
     }
 
-    peripheral.readCharacteristicValue(characteristicId, callbackContext);
+    cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+          peripheral.readCharacteristicValue(characteristicId, callbackContext);
+        }
+      });
   }
 
-  // TODO: using a write queue to exec these writes
-  private void writeCharacteristicValue(CordovaArgs args, CallbackContext callbackContext)
+  private void writeCharacteristicValue(CordovaArgs args, final CallbackContext callbackContext)
       throws JSONException {
 
-    String characteristicId = args.getString(0);
+    final String characteristicId = args.getString(0);
     String deviceAddress = getDeviceAddressFromInstanceId(characteristicId);
-    byte[] value = args.getArrayBuffer(1);
+    final byte[] value = args.getArrayBuffer(1);
 
-    ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
+    final ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
 
     if (peripheral == null) {
       callbackContext.error("Invalid Argument");
       return;
     }
 
-    peripheral.writeCharacteristicValue(characteristicId, value, callbackContext);
+    cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+          peripheral.writeCharacteristicValue(characteristicId, value, callbackContext);
+        }
+      });
   }
 
-  private void startCharacteristicNotifications(CordovaArgs args, CallbackContext callbackContext)
+  private void startCharacteristicNotifications(CordovaArgs args, final CallbackContext callbackContext)
       throws JSONException {
 
-    String characteristicId = args.getString(0);
+    final String characteristicId = args.getString(0);
     String deviceAddress = getDeviceAddressFromInstanceId(characteristicId);
 
-    ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
+    final ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
 
     if (peripheral == null) {
       callbackContext.error("Invalid Argument");
       return;
     }
 
-    peripheral.setCharacteristicNotification(characteristicId, true, callbackContext);
+    cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+          peripheral.setCharacteristicNotification(characteristicId, true, callbackContext);
+        }
+      });
   }
 
-  private void stopCharacteristicNotifications(CordovaArgs args, CallbackContext callbackContext)
+  private void stopCharacteristicNotifications(CordovaArgs args, final CallbackContext callbackContext)
       throws JSONException {
 
-    String characteristicId = args.getString(0);
+    final String characteristicId = args.getString(0);
     String deviceAddress = getDeviceAddressFromInstanceId(characteristicId);
 
-    ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
+    final ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
 
     if (peripheral == null) {
       callbackContext.error("Invalid Argument");
       return;
     }
 
-    peripheral.setCharacteristicNotification(characteristicId, false, callbackContext);
+    cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+          peripheral.setCharacteristicNotification(characteristicId, false, callbackContext);
+        }
+      });
   }
 
-  private void readDescriptorValue(CordovaArgs args, CallbackContext callbackContext)
+  private void readDescriptorValue(CordovaArgs args, final CallbackContext callbackContext)
       throws JSONException {
-    String descriptorId = args.getString(0);
+    final String descriptorId = args.getString(0);
     String deviceAddress = getDeviceAddressFromInstanceId(descriptorId);
 
-    ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
+    final ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
 
     if (peripheral == null) {
       callbackContext.error("Invalid Argument");
       return;
     }
 
-    peripheral.readDescriptorValue(descriptorId, callbackContext);
+    cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+          peripheral.readDescriptorValue(descriptorId, callbackContext);
+        }
+      });
   }
 
-  private void writeDescriptorValue(CordovaArgs args, CallbackContext callbackContext)
+  private void writeDescriptorValue(CordovaArgs args, final CallbackContext callbackContext)
       throws JSONException {
 
-    String descriptorId = args.getString(0);
+    final String descriptorId = args.getString(0);
     String deviceAddress = getDeviceAddressFromInstanceId(descriptorId);
-    byte[] value = args.getArrayBuffer(1);
+    final byte[] value = args.getArrayBuffer(1);
 
-    ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
+    final ChromeBluetoothLowEnergyPeripheral peripheral = getPeripheralByDeviceAddress(deviceAddress);
 
     if (peripheral == null) {
       callbackContext.error("Invalid Argument");
       return;
     }
 
-    peripheral.writeDescriptorValue(descriptorId, value, callbackContext);
+    cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+          peripheral.writeDescriptorValue(descriptorId, value, callbackContext);
+        }
+      });
   }
 
   private void registerBluetoothLowEnergyEvents(CallbackContext callbackContext)
@@ -593,6 +617,11 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
     private Map<String, CallbackContext> readDescriptorValueCallbackContexts = new HashMap<>();
     private Map<String, CallbackContext> writeDescriptorValueCallbackContexts = new HashMap<>();
 
+    // BluetoothGatt only allows one async command at a time; otherwise, it will
+    // cancel the previous command. Using this semaphore to ensure calling
+    // BluetoothGatt async method in serial.
+    private Semaphore gattAsyncCommandSemaphore = new Semaphore(1, true);
+
     ChromeBluetoothLowEnergyPeripheral(ScanResult bleScanResult) {
       this.bleScanResult = bleScanResult;
     }
@@ -631,7 +660,7 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
       BluetoothGattService service = knownServices.get(serviceId);
 
       if (service == null) {
-        Collections.emptyList();
+        return Collections.emptyList();
       }
 
       Collection<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
@@ -701,10 +730,15 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
         return;
       }
 
-      if (gatt.readCharacteristic(characteristic)) {
-        readCharacteristicValueCallbackContexts.put(characteristicId, callbackContext);
-      } else {
-        callbackContext.error("Failed to read characteristic value");
+      try {
+        gattAsyncCommandSemaphore.acquire();
+        if (gatt.readCharacteristic(characteristic)) {
+          readCharacteristicValueCallbackContexts.put(characteristicId, callbackContext);
+        } else {
+          gattAsyncCommandSemaphore.release();
+          callbackContext.error("Failed to read characteristic value");
+        }
+      } catch (InterruptedException e) {
       }
     }
 
@@ -718,10 +752,15 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
         return;
       }
 
-      if (characteristic.setValue(value) && gatt.writeCharacteristic(characteristic)) {
-        writeCharacteristicValueCallbackContexts.put(characteristicId, callbackContext);
-      } else {
-        callbackContext.error("Failed to write value into characteristic");
+      try {
+        gattAsyncCommandSemaphore.acquire();
+        if (characteristic.setValue(value) && gatt.writeCharacteristic(characteristic)) {
+          writeCharacteristicValueCallbackContexts.put(characteristicId, callbackContext);
+        } else {
+          gattAsyncCommandSemaphore.release();
+          callbackContext.error("Failed to write value into characteristic");
+        }
+      } catch (InterruptedException e) {
       }
     }
 
@@ -751,10 +790,15 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
         configDescriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
       }
 
-      if (gatt.writeDescriptor(configDescriptor)) {
-        setNotificationCallbackContexts.put(characteristicId, callbackContext);
-      } else {
-        callbackContext.error("Failed to set characteristic remote notification");
+      try {
+        gattAsyncCommandSemaphore.acquire();
+        if (gatt.writeDescriptor(configDescriptor)) {
+          setNotificationCallbackContexts.put(characteristicId, callbackContext);
+        } else {
+          gattAsyncCommandSemaphore.release();
+          callbackContext.error("Failed to set characteristic remote notification");
+        }
+      } catch (InterruptedException e) {
       }
     }
 
@@ -767,10 +811,15 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
         return;
       }
 
-      if (gatt.readDescriptor(descriptor)) {
-        readDescriptorValueCallbackContexts.put(descriptorId, callbackContext);
-      } else {
-        callbackContext.error("Failed to read descriptor value");
+      try {
+        gattAsyncCommandSemaphore.acquire();
+        if (gatt.readDescriptor(descriptor)) {
+          readDescriptorValueCallbackContexts.put(descriptorId, callbackContext);
+        } else {
+          gattAsyncCommandSemaphore.release();
+          callbackContext.error("Failed to read descriptor value");
+        }
+      } catch (InterruptedException e) {
       }
     }
 
@@ -783,10 +832,15 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
         return;
       }
 
-      if (descriptor.setValue(value) && gatt.writeDescriptor(descriptor)) {
-        writeDescriptorValueCallbackContexts.put(descriptorId, callbackContext);
-      } else {
-        callbackContext.error("Failed to write value into descriptor");
+      try {
+        gattAsyncCommandSemaphore.acquire();
+        if (descriptor.setValue(value) && gatt.writeDescriptor(descriptor)) {
+          writeDescriptorValueCallbackContexts.put(descriptorId, callbackContext);
+        } else {
+          gattAsyncCommandSemaphore.release();
+          callbackContext.error("Failed to write value into descriptor");
+        }
+      } catch (InterruptedException e) {
       }
     }
 
@@ -801,6 +855,8 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
         @Override
         public void onCharacteristicRead(
             BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+
+          gattAsyncCommandSemaphore.release();
 
           String characteristicId = buildCharacteristicId(
               bleScanResult.getDevice().getAddress(), characteristic);
@@ -834,6 +890,8 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
         public void onCharacteristicWrite(
             BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
 
+          gattAsyncCommandSemaphore.release();
+
           String characteristicId = buildCharacteristicId(
               bleScanResult.getDevice().getAddress(), characteristic);
           CallbackContext writeCallbackContext =
@@ -865,15 +923,23 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
 
-          Log.e(LOG_TAG, "connection state changes - state: " + newState);
+          Log.d(LOG_TAG, "connection state changes - state: " + newState);
 
           switch (newState) {
             case BluetoothProfile.STATE_CONNECTED:
               if (connectCallback != null) {
                 connectCallback.success();
                 connectCallback = null;
+
+                try {
+                  gattAsyncCommandSemaphore.acquire();
+                  if (!gatt.discoverServices()) {
+                    gattAsyncCommandSemaphore.release();
+                  }
+                } catch (InterruptedException e) {
+                }
               }
-              gatt.discoverServices();
+
               break;
             case BluetoothProfile.STATE_DISCONNECTED:
               if (disconnectCallback != null) {
@@ -884,6 +950,9 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
               for (BluetoothGattService service : knownServices.values()) {
                 sendServiceRemovedEvent(bleScanResult.getDevice().getAddress(), service);
               }
+
+              gatt.close();
+              gatt = null;
 
               knownServices.clear();
               knownPeripheral.remove(bleScanResult.getDevice().getAddress());
@@ -898,6 +967,8 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
         @Override
         public void onDescriptorRead(
             BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+
+          gattAsyncCommandSemaphore.release();
 
           String descriptorId = buildDescriptorId(
               bleScanResult.getDevice().getAddress(), descriptor);
@@ -930,6 +1001,8 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
         @Override
         public void onDescriptorWrite(
             BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+
+          gattAsyncCommandSemaphore.release();
 
           CallbackContext callbackContext;
           PluginResult result = null;
@@ -978,18 +1051,24 @@ public class ChromeBluetoothLowEnergy extends CordovaPlugin {
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-          List<BluetoothGattService> discoveredServices = gatt.getServices();
-          for (BluetoothGattService discoveredService : discoveredServices) {
-            String serviceId = buildServiceId(
-                bleScanResult.getDevice().getAddress(),
-                discoveredService);
-            if (knownServices.containsKey(serviceId)) {
-              sendServiceChangedEvent(bleScanResult.getDevice().getAddress(), discoveredService);
-            } else {
-              sendServiceAddedEvent(bleScanResult.getDevice().getAddress(), discoveredService);
+
+          gattAsyncCommandSemaphore.release();
+
+          if (status == BluetoothGatt.GATT_SUCCESS) {
+            List<BluetoothGattService> discoveredServices = gatt.getServices();
+            for (BluetoothGattService discoveredService : discoveredServices) {
+              String serviceId = buildServiceId(
+                  bleScanResult.getDevice().getAddress(),
+                  discoveredService);
+              if (knownServices.containsKey(serviceId)) {
+                sendServiceChangedEvent(bleScanResult.getDevice().getAddress(), discoveredService);
+              } else {
+                sendServiceAddedEvent(bleScanResult.getDevice().getAddress(), discoveredService);
+              }
+              knownServices.put(serviceId, discoveredService);
             }
-            knownServices.put(serviceId, discoveredService);
           }
+
         }
       };
   }
